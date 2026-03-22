@@ -1,4 +1,4 @@
-name: CI Workflow
+name: Student Demo CI/CD Pipeline
 
 on:
   push:
@@ -7,16 +7,68 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  # === JOB 1: LINTING & TESTING ===
+  # This job runs first to ensure the code is correct.
+  test-and-lint:
+    name: 🧪 Run Tests & Linter
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Run a one-line script
-      run: echo Hello, world!
-    
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+      - name: 📥 Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Run code linter
+        run: |
+          echo "Simulating a code linter (checking for style and syntax errors)..."
+          echo "Linting complete. No issues found!"
+          sleep 2
+          
+      - name: ✅ Run unit tests
+        run: |
+          echo "Simulating automated tests..."
+          echo "Test 1: User Login - PASS"
+          echo "Test 2: Database Connection - PASS"
+          echo "All 2 tests passed successfully!"
+          sleep 2
+
+  # === JOB 2: BUILD ===
+  # This job only runs if the tests above pass ('needs: test-and-lint')
+  build:
+    name: 🏗️ Build Application
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Build the software
+        run: |
+          echo "Compiling and building the application..."
+          mkdir -p dist
+          echo "This file represents the compiled application ready to be deployed." > dist/demo-app.txt
+          echo "Build finished successfully!"
+          sleep 2
+          
+      - name: 📦 Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-demo-app
+          path: dist/
+          
+  # === JOB 3: DEPLOYMENT ===
+  # This job only runs if 'build' succeeds AND the branch is 'main' or 'master'.
+  # This simulates how you wouldn't deploy code from a Pull Request directly.
+  deploy:
+    name: 🚀 Deploy to Production
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: ☁️ Deploy Application
+        run: |
+          echo "Simulating deployment to production servers..."
+          echo "Downloading artifact securely..."
+          sleep 1
+          echo "Copying files to server..."
+          sleep 2
+          echo "Restarting services..."
+          echo "Deployment successful! 🎉 Application is live."
